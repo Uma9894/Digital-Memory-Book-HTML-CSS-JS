@@ -3,30 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>document</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Upload Your Files</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: block;
+            margin: 0 auto;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+        }
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        select, input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            box-sizing: border-box;
+            background: #fafafa;
+            font-size: 16px;
+        }
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+            padding: 0;
+            list-style: none;
+        }
+        .file-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            background: #f9f9f9;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .file-list li:hover {
+            background: #f1f1f1;
+        }
+        .file-list img {
+            max-width: 80px;
+            height: auto;
+            margin-right: 15px;
+            border-radius: 5px;
+        }
+        .file-list span {
+            flex: 1;
+            font-size: 16px;
+        }
+        .file-list button {
+            background: #dc3545;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .file-list button:hover {
+            background: #c82333;
+        }
+    </style>
 </head>
 <body>
-    <div class="navbar">
-        <h1>AUC LOCKBOOK</h1>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="contact.html">Contact</a></li>
-        </ul>
-    </div>
-    <div class="content">
-        <h1 class="typing-effect">YOUR DIGITAL WALLET..!</h1>
-        <p>Your ultimate digital storage solution is here!<br>
-           Our platform ensures your files are safe, secure, and easily accessible anytime, anywhere.<br>
-           Share files effortlessly with friends, family, or colleagues using our intuitive sharing features.
-        </p>
-        <div>
+    <div class="container">
+        <h1>Modern File Upload</h1>
+        <input type="file" id="fileInput" multiple>
+        <button onclick="uploadFiles()">Upload</button>
 
-            <a href="login.html"><button type="button"><span></span>LOGIN</button></a>
-            <button type="button"><span></span>SIGNUP</button>
+        <h2>Uploaded Files:</h2>
+        <div class="file-list">
+            <h3>Images</h3>
+            <ul id="imageList">No images uploaded.</ul>
+            <h3>Videos</h3>
+            <ul id="videoList">No videos uploaded.</ul>
+            <h3>Audio</h3>
+            <ul id="audioList">No audio files uploaded.</ul>
         </div>
+
+        <h2>Retrieve or Delete a File</h2>
+        <input type="text" id="filename" placeholder="Enter filename">
+        <select id="fileType">
+            <option value="image">Image</option>
+            <option value="video">Video</option>
+            <option value="audio">Audio</option>
+        </select>
+        <button onclick="retrieveFile()">Retrieve</button>
+        <button onclick="deleteFile()">Delete</button>
     </div>
+
+    <script>
+        let imageFiles = [];
+        let videoFiles = [];
+        let audioFiles = [];
+
+        function uploadFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileType = file.type.split('/')[0];
+                
+                if (fileType === 'image') {
+                    imageFiles.push(file);
+                    appendToList('imageList', file);
+                } else if (fileType === 'video') {
+                    videoFiles.push(file);
+                    appendToList('videoList', file);
+                } else if (fileType === 'audio') {
+                    audioFiles.push(file);
+                    appendToList('audioList', file);
+                }
+            }
+        }
+
+        function appendToList(listId, file) {
+            const list = document.getElementById(listId);
+            const li = document.createElement('li');
+
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.alt = file.name;
+                li.appendChild(img);
+            }
+
+            const filename = document.createElement('span');
+            filename.textContent = file.name;
+            li.appendChild(filename);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = function() {
+                deleteFile(file.name, file.type.split('/')[0]);
+                li.remove();
+            };
+            li.appendChild(deleteButton);
+
+            if (list.children.length === 0) {
+                list.textContent = '';
+            }
+            list.appendChild(li);
+        }
+
+        function retrieveFile() {
+            const filename = document.getElementById('filename').value;
+            const fileType = document.getElementById('fileType').value;
+            let file = null;
+
+            if (fileType === 'image') {
+                file = imageFiles.find(f => f.name === filename);
+            } else if (fileType === 'video') {
+                file = videoFiles.find(f => f.name === filename);
+            } else if (fileType === 'audio') {
+                file = audioFiles.find(f => f.name === filename);
+            }
+
+            if (file) {
+                const url = URL.createObjectURL(file);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.click();
+                URL.revokeObjectURL(url);
+            } else {
+                alert('File not found.');
+            }
+        }
+
+        function deleteFile(filename, fileType) {
+            if (fileType === 'image') {
+                imageFiles = imageFiles.filter(f => f.name !== filename);
+            } else if (fileType === 'video') {
+                videoFiles = videoFiles.filter(f => f.name !== filename);
+            } else if (fileType === 'audio') {
+                audioFiles = audioFiles.filter(f => f.name !== filename);
+            }
+            alert('File deleted successfully.');
+        }
+    </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
 

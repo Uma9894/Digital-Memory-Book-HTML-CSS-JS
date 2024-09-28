@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="searchApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Files</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+        var app = angular.module('searchApp', []);
+
+        app.controller('SearchController', ['$scope', function($scope) {
+            $scope.files = JSON.parse(localStorage.getItem('files')) || [];
+            $scope.searchQuery = '';
+
+            $scope.searchFiles = function() {
+                return $scope.files.filter(file => file.name.toLowerCase().includes($scope.searchQuery.toLowerCase()));
+            };
+        }]);
+    </script>
+    <style>
+        body {
+            background-color: black;
+            color: aliceblue;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+        .file-list li {
+            margin: 10px 0;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid aliceblue;
+            color: black;
+            background-color: aliceblue;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body ng-controller="SearchController">
+    <div class="container">
+        <h1>Uploaded Files</h1>
+        <input type="text" ng-model="searchQuery" placeholder="Search for files...">
+        <ul class="file-list">
+            <li ng-repeat="file in searchFiles()">
+                <a ng-href="{{file.url}}" target="_blank">{{file.name}}</a>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>
